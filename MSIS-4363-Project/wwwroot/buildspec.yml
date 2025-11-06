@@ -2,22 +2,37 @@ version: 0.2
 
 env:
   variables:
-    BUILD_DIR: "."
-    S3_BUCKET: "msis-4363"   # your bucket name
+    # Point this to the folder that actually contains your site files.
+    # If your repo layout is different, fix this path.
+    BUILD_DIR: "MSIS-4363-Project/wwwroot"
+    S3_BUCKET: "msis-4363"
 
 phases:
   install:
     commands:
       - echo "No dependencies needed"
+
   build:
     commands:
       - echo "No build step"
+
   post_build:
     commands:
-      - echo "Deploying to S3"
-      - aws s3 sync $BUILD_DIR s3://$S3_BUCKET --delete --exclude ".git/*" --exclude "buildspec.yml"
+      - echo "========== DEPLOYING TO S3 =========="
+      - echo "Current directory:"
+      - pwd
+      - echo "S3_BUCKET = $S3_BUCKET"
+      - echo "BUILD_DIR = $BUILD_DIR"
+      - echo "Listing BUILD_DIR:"
+      - ls -R "$BUILD_DIR" || { echo "BUILD_DIR does NOT exist"; exit 1; }
+      - echo "AWS CLI version:"
+      - aws --version
+      - echo "---------- DRY RUN sync (no real upload) ----------"
+      - aws s3 sync "$BUILD_DIR" "s3://$S3_BUCKET" --delete --exclude ".git/*" --exclude "buildspec.yml" --dryrun
+      - echo "---------- REAL sync ----------"
+      - aws s3 sync "$BUILD_DIR" "s3://$S3_BUCKET" --delete --exclude ".git/*" --exclude "buildspec.yml"
 
 artifacts:
   files:
     - '**/*'
-  base-directory: $BUILD_DIR
+  base-directory: MSIS-4363-Project/wwwroot
