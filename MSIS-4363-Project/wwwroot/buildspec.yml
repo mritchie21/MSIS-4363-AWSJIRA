@@ -3,7 +3,7 @@ version: 0.2
 env:
   variables:
     BUILD_DIR: "."
-    S3_BUCKET: "devops-landing-prod"   # your bucket name
+    S3_BUCKET: "msis-4363"   # your bucket name
 
 phases:
   install:
