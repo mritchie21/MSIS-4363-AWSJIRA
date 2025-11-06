@@ -16,21 +16,21 @@ phases:
     commands:
       - echo "No build step"
 
-  post_build:
-    commands:
-      - echo "========== DEPLOYING TO S3 =========="
-      - echo "Current directory:"
-      - pwd
-      - echo "S3_BUCKET = $S3_BUCKET"
-      - echo "BUILD_DIR = $BUILD_DIR"
-      - echo "Listing BUILD_DIR:"
-      - ls -R "$BUILD_DIR" || { echo "BUILD_DIR does NOT exist"; exit 1; }
-      - echo "AWS CLI version:"
-      - aws --version
-      - echo "---------- DRY RUN sync (no real upload) ----------"
-      - aws s3 sync "$BUILD_DIR" "s3://$S3_BUCKET" --delete --exclude ".git/*" --exclude "buildspec.yml" --dryrun
-      - echo "---------- REAL sync ----------"
-      - aws s3 sync "$BUILD_DIR" "s3://$S3_BUCKET" --delete --exclude ".git/*" --exclude "buildspec.yml"
+post_build:
+  commands:
+    - echo "========== DEPLOYING TO S3 =========="
+    - echo "Current directory:"
+    - pwd
+    - echo "S3_BUCKET = $S3_BUCKET"
+    - echo "BUILD_DIR = $BUILD_DIR"
+    - echo "Listing BUILD_DIR:"
+    - ls -R "$BUILD_DIR" || { echo "BUILD_DIR does NOT exist"; exit 1; }
+    - echo "Checking bucket access:"
+    - aws s3 ls "s3://$S3_BUCKET"
+    - echo "AWS CLI version:"
+    - aws --version
+    - echo "---------- DRY RUN sync (no real upload) ----------"
+    - aws s3 sync "$BUILD_DIR" "s3://$S3_BUCKET" --delete --exclude ".git/*" --exclude "buildspec.yml" --dryrun
 
 artifacts:
   files:
